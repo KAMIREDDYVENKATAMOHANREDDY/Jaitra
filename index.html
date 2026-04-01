@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JAITRA | Chariot Command</title>
+    <style>
+        :root { --bg-dark: #2d2d2b; --panel-bg: #8d8a7f; --input-bg: #5a574f; --gold: #ffb400; --text-light: #f1f1f1; --text-dark: #1a1a1a; --red: #ef4444; --green: #22c55e; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); margin: 0; padding-bottom: 80px; }
+        .navbar { background: #1a1a1a; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 2px solid var(--gold); }
+        .logo-text { font-size: 22px; font-weight: bold; letter-spacing: 2px; }
+        .logo-text span { color: var(--gold); }
+        .slogan-top { font-size: 10px; color: var(--gold); text-align: right; font-style: italic; }
+        .debt-box { max-width: 1100px; margin: 20px auto; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .progress-container { background: #000; height: 12px; border-radius: 10px; margin: 8px 0; overflow: hidden; }
+        .progress-fill { background: linear-gradient(90deg, var(--green), var(--gold)); height: 100%; transition: 0.8s; width: 0%; }
+        .main-container { max-width: 1100px; margin: 0 auto; background: var(--panel-bg); border-radius: 8px; padding: 25px; color: var(--text-dark); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .nav-tabs { display: flex; gap: 5px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 8px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; cursor: pointer; font-weight: bold; color: #444; text-transform: uppercase; font-size: 11px; }
+        .tab-btn.active { background: var(--gold); color: #000; border-radius: 5px; }
+        label { display: block; font-size: 10px; font-weight: 900; margin-bottom: 4px; text-transform: uppercase; color: #333; }
+        input, select { width: 100%; background: var(--input-bg); border: 1px solid #4a473f; padding: 12px; color: white; border-radius: 6px; margin-bottom: 15px; font-size: 14px; }
+        .btn-gold { width: 100%; padding: 16px; border-radius: 8px; border: none; background: #e1e1e1; color: #000; font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 #bbb; margin-bottom: 10px; }
+        .btn-gold:hover { background: var(--gold); }
+        .history-item { background: rgba(0,0,0,0.1); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; border: 1px solid rgba(0,0,0,0.05); align-items: center; }
+        .action-btns button { border: none; background: none; cursor: pointer; font-size: 16px; margin-left: 10px; }
+        .hidden { display: none !important; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #4a473f; color: var(--gold); padding: 10px; border-radius: 8px; text-align: center; }
+        .stat-card small { font-size: 9px; text-transform: uppercase; color: white; display: block; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo-text"><span>JAITRA</span> COMMAND</div>
+    <div class="slogan-top">"Karmanye vadhikaraste ma phaleshu kadachana"<br>"Ee samayam vellipothundhi"</div>
+</div>
+
+<div class="debt-box">
+    <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:bold;">
+        <span>CAR INITIAL INVESTMENT RECOVERY</span><span id="recovery-pct">0%</span>
+    </div>
+    <div class="progress-container"><div class="progress-fill" id="recovery-bar"></div></div>
+    <div style="display:flex; justify-content:space-between; font-size:11px; color: var(--gold);">
+        <span>Recovered: <b id="recovered-amt">₹0</b></span>
+        <span>Remaining Balance: <b id="remaining-debt">₹0</b></span>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="showTab('ledger', this)">Logs</button>
+        <button class="tab-btn" onclick="showTab('equity', this)">Brothers</button>
+        <button class="tab-btn" onclick="showTab('reports', this)">Reports</button>
+    </div>
+
+    <div id="tab-ledger">
+        <div class="stats-grid">
+            <div class="stat-card"><small>Repair Fund (15%)</small><b id="dash-maint">₹0</b></div>
+            <div class="stat-card"><small>Net Profit</small><b id="dash-profit">₹0</b></div>
+            <div class="stat-card"><small>Share / Brother</small><b id="dash-share">₹0</b></div>
+        </div>
+        <input type="hidden" id="edit-id">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+            <div><label>Activity Type</label><select id="log-type" onchange="toggleFields()"><option value="shift_only">Company Shift</option><option value="rapido">Rapido Ride</option><option value="renting">Car Renting</option><option value="other_income">Other Income</option><option value="diesel">Diesel Expense</option><option value="maint">Maintenance</option><option value="others_exp">Other Expense</option></select></div>
+            <div><label>Date</label><input type="date" id="log-date"></div>
+        </div>
+
+        <div id="odo-section" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+            <div><label>Start Odo</label><input type="number" id="odo-start" readonly></div>
+            <div><label>Kms Driven</label><input type="number" id="kms-input" placeholder="Distance" oninput="calcEndOdo()"></div>
+            <div><label>End Odo</label><input type="number" id="odo-end" placeholder="Result"></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+            <div id="amt-section"><label>Amount (₹)</label><input type="number" id="log-amt"></div>
+            <div id="driver-section"><label>Driver Fee (₹)</label><input type="number" id="driver-amt"></div>
+        </div>
+        <div id="paid-by-section"><label>Paid By / Received By</label><select id="paid-by-user"><option value="Pool/Chariot">Pool / Chariot Cash</option><option value="Mohan">Mohan</option><option value="Ravi">Ravi</option><option value="Mahesh">Mahesh</option><option value="Sandeep">Sandeep</option><option value="Raghu">Raghu</option></select></div>
+        <label>Note</label><input type="text" id="log-note" placeholder="Details...">
+        <button class="btn-gold" id="save-btn" onclick="addEntry()">SAVE ACTIVITY</button>
+        <div id="log-list"></div>
+    </div>
+
+    <div id="tab-equity" class="hidden">
+        <label>Car Initial Purchase Price (Total Debt)</label>
+        <input type="number" id="car-total-cost" placeholder="e.g. 325000" onchange="saveCarCost()">
+        <label>Brotherhood Initial Investment Shares</label>
+        <div id="invest-inputs" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"></div>
+        <button class="btn-gold" style="margin-top:10px;" onclick="saveEquity()">LOCK INVESTMENTS</button>
+    </div>
+
+    <div id="tab-reports" class="hidden">
+        <label>Range</label><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><input type="date" id="rep-from"><input type="date" id="rep-to"></div>
+        <button class="btn-gold" style="margin-top:15px; background:var(--accent);" onclick="generatePDF()">📄 PDF REPORT</button>
+        <button class="btn-gold" style="background:#5a574f; color:white;" onclick="exportCSV()">📊 CSV EXPORT</button>
+    </div>
+</div>
+
+<script>
+    const NAMES = ["Mohan", "Ravi", "Mahesh", "Sandeep", "Raghu"];
+    const INITIAL_ODO = 137422; 
+    let logs = JSON.parse(localStorage.getItem('jaitra_v15_logs')) || [];
+    let equity = JSON.parse(localStorage.getItem('jaitra_v15_equity')) || {};
+    let carCost = localStorage.getItem('jaitra_v15_carcost') || 0;
+
+    function showTab(t, btn) {
+        document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+        document.getElementById('tab-' + t).classList.remove('hidden');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if(t === 'equity') renderEquity();
+    }
+
+    function toggleFields() {
+        const type = document.getElementById('log-type').value;
+        const isTrip = ['shift_only', 'rapido', 'renting'].includes(type);
+        const hasAmt = type !== 'shift_only';
+        document.getElementById('odo-section').classList.toggle('hidden', !isTrip);
+        document.getElementById('amt-section').classList.toggle('hidden', !hasAmt);
+        document.getElementById('driver-section').classList.toggle('hidden', !isTrip);
+        document.getElementById('paid-by-section').classList.toggle('hidden', !hasAmt);
+    }
+
+    function calcEndOdo() {
+        const start = parseFloat(document.getElementById('odo-start').value) || 0;
+        const kms = parseFloat(document.getElementById('kms-input').value) || 0;
+        if(kms > 0) document.getElementById('odo-end').value = start + kms;
+    }
+
+    function init() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('log-date').value = today;
+        document.getElementById('rep-from').value = today;
+        document.getElementById('rep-to').value = today;
+        refreshUI();
+        toggleFields();
+    }
+
+    function renderEquity() {
+        const div = document.getElementById('invest-inputs');
+        div.innerHTML = '';
+        document.getElementById('car-total-cost').value = carCost;
+        NAMES.forEach(n => { div.innerHTML += `<div><label>${n}</label><input type="number" id="e-${n}" value="${equity[n]||0}"></div>`; });
+    }
+
+    function saveCarCost() { carCost = document.getElementById('car-total-cost').value; localStorage.setItem('jaitra_v15_carcost', carCost); refreshUI(); }
+    function saveEquity() { NAMES.forEach(n => equity[n] = parseFloat(document.getElementById('e-'+n).value || 0)); localStorage.setItem('jaitra_v15_equity', JSON.stringify(equity)); alert("Shares Locked."); }
+
+    function addEntry() {
+        const id = document.getElementById('edit-id').value;
+        const entry = {
+            id: id ? parseInt(id) : Date.now(),
+            type: document.getElementById('log-type').value,
+            date: document.getElementById('log-date').value,
+            amt: parseFloat(document.getElementById('log-amt').value || 0),
+            note: document.getElementById('log-note').value,
+            oStart: parseFloat(document.getElementById('odo-start').value || INITIAL_ODO),
+            oEnd: parseFloat(document.getElementById('odo-end').value || 0),
+            drv: parseFloat(document.getElementById('driver-amt').value || 0),
+            paidBy: document.getElementById('paid-by-user').value
+        };
+        if(id) { const idx = logs.findIndex(l => l.id === parseInt(id)); logs[idx] = entry; } else { logs.push(entry); }
+        localStorage.setItem('jaitra_v15_logs', JSON.stringify(logs));
+        document.getElementById('edit-id').value = '';
+        document.getElementById('kms-input').value = '';
+        document.getElementById('save-btn').innerText = 'SAVE ACTIVITY';
+        refreshUI();
+    }
+
+    function editEntry(id) {
+        const l = logs.find(log => log.id === id);
+        document.getElementById('edit-id').value = l.id;
+        document.getElementById('log-type').value = l.type;
+        document.getElementById('log-date').value = l.date;
+        document.getElementById('log-amt').value = l.amt;
+        document.getElementById('log-note').value = l.note;
+        document.getElementById('odo-start').value = l.oStart;
+        document.getElementById('odo-end').value = l.oEnd;
+        if(l.oEnd > l.oStart) document.getElementById('kms-input').value = l.oEnd - l.oStart;
+        document.getElementById('driver-amt').value = l.drv;
+        document.getElementById('paid-by-user').value = l.paidBy;
+        document.getElementById('save-btn').innerText = 'UPDATE ENTRY';
+        toggleFields();
+        window.scrollTo(0,0);
+    }
+
+    function deleteEntry(id) { if(confirm("Delete?")) { logs = logs.filter(l => l.id !== id); localStorage.setItem('jaitra_v15_logs', JSON.stringify(logs)); refreshUI(); } }
+
+    function refreshUI() {
+        let income = 0, expenses = 0, maintFund = 0, maxOdo = INITIAL_ODO;
+        logs.forEach(l => {
+            const isInc = ['rapido', 'renting', 'other_income', 'shift_only'].includes(l.type);
+            if(isInc) { income += l.amt; maintFund += (l.amt * 0.15); } 
+            else { expenses += l.amt; if(l.type === 'maint') maintFund -= l.amt; }
+            expenses += (l.drv || 0);
+            if(l.oEnd > maxOdo) maxOdo = l.oEnd;
+        });
+        const netProfit = income - expenses - (income * 0.15);
+        document.getElementById('dash-maint').innerText = `₹${maintFund.toFixed(0)}`;
+        document.getElementById('dash-profit').innerText = `₹${netProfit.toFixed(0)}`;
+        document.getElementById('dash-share').innerText = `₹${(netProfit / 5).toFixed(0)}`;
+        document.getElementById('odo-start').value = maxOdo;
+        
+        if(carCost > 0) {
+            const pct = Math.min(100, (netProfit / carCost) * 100);
+            document.getElementById('recovery-pct').innerText = (pct > 0 ? pct.toFixed(1) : 0) + '%';
+            document.getElementById('recovery-bar').style.width = (pct > 0 ? pct : 0) + '%';
+            document.getElementById('recovered-amt').innerText = `₹${Math.max(0, netProfit).toFixed(0)}`;
+            document.getElementById('remaining-debt').innerText = `₹${Math.max(0, carCost - netProfit).toFixed(0)}`;
+        }
+        let html = '';
+        logs.slice().reverse().forEach(l => {
+            const isInc = ['rapido', 'renting', 'other_income', 'shift_only'].includes(l.type);
+            html += `<div class="history-item"><span><b>${l.type.toUpperCase()}</b><br><small>${l.date} • ${l.paidBy}</small></span><div class="action-btns"><span style="color:${isInc?'green':'red'}; font-weight:bold;">₹${l.amt}</span><button onclick="editEntry(${l.id})">✏️</button><button onclick="deleteEntry(${l.id})">🗑️</button></div></div>`;
+        });
+        document.getElementById('log-list').innerHTML = html;
+    }
+
+    function exportCSV() {
+        let csv = "Date,Type,Paid By,Note,Start Odo,End Odo,Kms,Amount\n";
+        logs.forEach(l => { csv += `${l.date},${l.type.toUpperCase()},${l.paidBy},"${l.note||'-'}",${l.oStart},${l.oEnd},${l.oEnd?(l.oEnd-l.oStart):0},${l.amt}\n`; });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Jaitra_Export.csv'; a.click();
+    }
+
+    function generatePDF() {
+        const from = document.getElementById('rep-from').value;
+        const to = document.getElementById('rep-to').value;
+        const filtered = logs.filter(l => l.date >= from && l.date <= to).sort((a,b) => new Date(a.date)-new Date(b.date));
+        if(!filtered.length) return alert("No data");
+        let iT = 0, eT = 0;
+        filtered.forEach(l => { if(['rapido','renting','other_income','shift_only'].includes(l.type)) iT += l.amt; else eT += l.amt; eT += (l.drv||0); });
+        const win = window.open('', '_blank');
+        win.document.write(`<html><head><style>body{font-family:sans-serif;padding:20px;} table{width:100%;border-collapse:collapse;margin-top:20px;font-size:10px;} th,td{border:1px solid #000;padding:6px;} th{background:#eee;}</style></head><body><h1 align="center">JAITRA STATEMENT</h1><p align="center">${from} to ${to}</p><div style="border:1px solid #000;padding:10px;"><b>Income:</b> ₹${iT} | <b>Expense:</b> ₹${eT} | <b>Net Profit:</b> ₹${(iT*0.85-eT).toFixed(0)}</div><table><thead><tr><th>Date</th><th>Activity</th><th>By Person</th><th>Note</th><th>Odo</th><th>Kms</th><th>Amount</th></tr></thead><tbody>${filtered.map(l => `<tr><td>${l.date}</td><td>${l.type.toUpperCase()}</td><td>${l.paidBy}</td><td>${l.note||'-'}</td><td>${l.oStart}-${l.oEnd}</td><td>${l.oEnd?(l.oEnd-l.oStart):0}</td><td>₹${l.amt}</td></tr>`).join('')}</tbody></table><div style="text-align:center;margin-top:30px;">"Karmanye vadhikaraste ma phaleshu kadachana"<br>"Ee samayam vellipothundhi"</div><script>setTimeout(() => { window.print(); window.close(); }, 700);<\/script></body></html>`);
+        win.document.close();
+    }
+    window.onload = init;
+</script>
+</body>
+</html>
